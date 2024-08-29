@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import { useState } from 'react';
 
 function App() {
   const [file, setFile] = useState(null);
@@ -12,23 +11,49 @@ function App() {
   };
 
   const handleUpload = async () => {
-    const formData = new FormData();
-    formData.append('file', file);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
 
-    const response = await axios.post('/api/pdf/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
+      const response = await fetch('/api/pdf/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Error uploading PDF');
       }
-    });
 
-    setExtractedText(response.data.extractedText);
+      const data = await response.json();
+      setExtractedText(data.extractedText);
+    } catch (error) {
+      console.error('Error uploading PDF:', error);
+    }
   };
 
   const handleAsk = async () => {
-    const response = await axios.post('/api/pdf/ask', { question, extractedText });
-    setAnswer(response.data.answer);
-  };
+    try {
+      const response = await fetch('/api/pdf/ask', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question,
+          extractedText,
+        }),
+      });
 
+      if (!response.ok) {
+        throw new Error('Error asking question');
+      }
+
+      const data = await response.json();
+      setAnswer(data.answer);
+    } catch (error) {
+      console.error('Error asking question:', error);
+    }
+  };
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
       <h1 className="text-4xl font-bold mb-6 text-indigo-600">PDF Chat Application</h1>
