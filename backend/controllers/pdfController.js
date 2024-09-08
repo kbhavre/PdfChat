@@ -16,6 +16,10 @@ exports.extractTextFromPDF = async (req, res) => {
   }
 };
 
+
+
+
+
 // Handle Question and Answer with OpenAI
 exports.getAnswer = async (req, res) => {
   try {
